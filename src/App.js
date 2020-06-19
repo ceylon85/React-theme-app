@@ -1,15 +1,31 @@
-import React from "react";
+import React, { useEffect } from "react";
 import logo from "./logo.svg";
 import "./App.css";
 
-import light from './theme/light'
-// import dark from './theme/dark'
-import Container from './theme/components/Container'
+import light from "./theme/light";
+import dark from "./theme/dark";
+import Container from "./theme/components/Container";
 import { ThemeProvider } from "styled-components";
+import { darkModeAction } from "./actions/config_action";
+import { useSelector, useDispatch } from "react-redux";
 
 function App() {
+  const dispatch = useDispatch();
+  const config = useSelector((state) => state.config);
+
+  useEffect(() => {
+    if (!config.darkMode) {
+      dispatch(darkModeAction(window.localStorage.getItem("theme")));
+    }
+  }, [config.darkMode, dispatch]);
+
+  const themeChange = (value) => {
+    window.localStorage.setItem('theme', value)
+    dispatch(darkModeAction(value))
+  }
+
   return (
-    <ThemeProvider className="App" theme={light}>
+    <ThemeProvider theme={config.darkMode === "light" ? light : dark}>
       <nav
         style={{
           width: "100%",
@@ -18,8 +34,8 @@ function App() {
           textAlign: "center",
         }}
       >
-        <button onClick={{}}>Dark Mode</button>
-        <button>Light Mode</button>
+        <button onClick={() => themeChange('dark')}>Dark Mode</button>
+        <button onClick={() => themeChange('light')}>Light Mode</button>
       </nav>
       <Container className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
